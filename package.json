@@ -1,0 +1,25 @@
+{
+  "name": "blih-open-api",
+  "version": "1.0.0",
+  "description": "Blih API wrapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devSwoop/blih-open-api.git"
+  },
+  "author": "devSwoop",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devSwoop/blih-open-api/issues"
+  },
+  "homepage": "https://github.com/devSwoop/blih-open-api#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "request": "^2.83.0"
+  }
+}
