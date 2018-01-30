@@ -17,9 +17,12 @@
   },
   "homepage": "https://github.com/devSwoop/blih-open-api#readme",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.1",
     "request": "^2.83.0"
   }
 }
