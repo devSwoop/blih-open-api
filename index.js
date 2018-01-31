@@ -9,49 +9,57 @@ const auth = require('./middlewares/auth.js')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 
-app.use(bodyParser.urlencoded({
-	extended: true
-}))
+var tokens = {}
+
+app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(cors())
+app.use(cors({credentials: true, origin: 'http://localhost:8080'}))
+app.use(function (req, res, next) {
+	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+	res.header('Access-Control-Allow-Headers', 'origin, host, accept, X-Requested-With, content-type')
+	next()
+})
+app.use(auth)
+
+app.get('/login/check', (req, res) => {
+	let token = req.query.token
+
+	if (!token) 
+		return res.send({ valid: false, message: 'No token' })
+	jwt.verify(token, config.jwtSecret, (err, decoded) => {
+		if (err)
+			return res.send({ valid: false, message: 'Error while decoding' })
+		res.send({ valid: true, email: decoded.email })
+	})
+})
 app.post('/login', (req, res) => {
 	let result = true
 
 	// TODO: check if account exists
 	if (req.body.email === undefined || req.body.password === undefined)
-		return res.status(401).send('Please provide an email and a password')
+		return res.status(401).send({ message: 'Please provide an email and a password' })
 	if (result === true) {
 		let token = jwt.sign({
-			email: req.body.email,
-			token: crypto.createHash('sha512').update(req.body.password).digest('hex')
+			email: req.body.email
 		}, config.jwtSecret, {
 			expiresIn : '12h'
 		})
-		res.cookie('x-access-token', token, {
-			httpOnly : true
-		})
-		return res.send('Successfully logged in')
+		tokens[req.body.email] = crypto.createHash('sha512').update(req.body.password).digest('hex')
+		return res.send({ token, message: 'Successfully logged in'})
 	} else {
 		return res.status(401).json({
-			success : false,
-			message : t('Wrong mail/password')
-		});
+			message : 'Wrong mail/password'
+		})
 	}
 })
-app.get('/logout', (req, res) => {
-	res.clearCookie('x-access-token').status(200).json({
-		success : true,
-		message : 'Disconnected'
-	})
-})
-app.use(auth)
+
 app.all('/*', (req, res) => {
 	let method = req.method
 	let data = req.body.data || ''
 	let body = {
 		data: data,
 		user: req.decoded.email,
-		signature: crypto.createHmac('sha512', req.decoded.token).update(req.decoded.email).update(data).digest('hex')
+		signature: crypto.createHmac('sha512', tokens[req.decoded.email]).update(req.decoded.email).update(data).digest('hex')
 	}
 
 	request({

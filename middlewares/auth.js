@@ -3,11 +3,11 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 
 module.exports = function(req, res, next) {
-	if (req.path === '/login' || req.path === '/logout') {
+	if (req.path === '/login' || req.path === '/logout' || req.path === '/login/check') {
 		return next()
 	}
 
-	let token = req.headers['x-access-token'] || req.cookies['x-access-token']
+	let token = req.query.token
 
 	if (!token) {
 		return res.status(401).json({
@@ -23,6 +23,7 @@ module.exports = function(req, res, next) {
 			})
 		} else {
 			req.decoded = decoded
+			req.toto = 'MAIS PUTAIN'
 			next()
 		}
 	})
